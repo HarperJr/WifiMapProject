@@ -96,7 +96,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         locationMarker = new LocationMarker(mapView);
         mapView.getOverlays().add(locationMarker);
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setTileSource(TileSourceFactory.ROADS_OVERLAY_NL);
         mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
         mapView.setMinZoomLevel(MapConstant.MIN_ZOOM);
