@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import h.maps.mapsproject.location.LocationHandler;
+import h.maps.mapsproject.map.MapFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,15 +22,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQ_CODE = 0x1001;
 
     private LocationHandler locationHandler;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestPermissionsForLocationUpdates();
-
-
         //Init map
         setContentView(R.layout.activity_main);
+
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
     }
 
     private void requestPermissionsForLocationUpdates() {
@@ -75,24 +77,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        locationHandler.startUpdates();
+        if (locationHandler != null) {
+            locationHandler.startUpdates();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        locationHandler.stopUpdates();
+        if (locationHandler != null) {
+            locationHandler.stopUpdates();
+        }
     }
 
     private LocationHandler.Callback locationCallback = new LocationHandler.Callback() {
         @Override
         public void onLocationChanged(Location location) {
-            //Update location state
+            if (mapFragment != null) mapFragment.onLocationChanged(location);
         }
 
         @Override
         public void onStatusChanged(String s) {
-            //Update status
+            if (mapFragment != null) mapFragment.onStatusChanged(s);
         }
     };
 
