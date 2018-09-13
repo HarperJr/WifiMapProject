@@ -8,14 +8,14 @@ import java.nio.ByteBuffer;
 public class HTTPRequestHandlerBuffered extends HTTPRequestHandler {
 
     public interface Callback {
-        void onReceive(Status status, String s);
+        void onReceive(String s);
     }
 
     public void doRequest(String request, final HTTPRequestHandlerBuffered.Callback callback) throws Exception {
         final HTTPRequestHandler.Callback httpCallback = new HTTPRequestHandler.Callback() {
             @Override
-            public void onReceive(Status status, ByteBuffer buffer) {
-                callback.onReceive(status, buffer.toString());
+            public void onReceive(ByteBuffer buffer) {
+                callback.onReceive(buffer.toString());
             }
         };
         super.doRequest(request, httpCallback);

@@ -12,19 +12,14 @@ import java.nio.ByteBuffer;
  */
 public class HTTPRequestHandler {
 
-    public enum Status {
-        ACCEPTED, INVALID
-    }
-
     public interface Callback {
-        void onReceive(Status status, ByteBuffer buffer);
+        void onReceive(ByteBuffer buffer);
     }
 
     public void doRequest(String request, Callback callback) throws Exception {
         if (callback == null) return;
         final HttpURLConnection connection = (HttpURLConnection) new URL(request).openConnection();
 
-        Status status = Status.INVALID;
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 
         if (connection != null) {
@@ -38,7 +33,6 @@ public class HTTPRequestHandler {
                     result = stream.read();
                 }
 
-                status = Status.ACCEPTED;
             } catch (IOException ex) {
                 ex.printStackTrace();
             } finally {
@@ -46,7 +40,7 @@ public class HTTPRequestHandler {
             }
         }
 
-        callback.onReceive(status, ByteBuffer.wrap(bytes.toByteArray()));
+        callback.onReceive(ByteBuffer.wrap(bytes.toByteArray()));
     }
 
 

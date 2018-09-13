@@ -25,13 +25,10 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-        final int status = intent.getIntExtra("Status", -1);
         final byte[] result = intent.getByteArrayExtra("Result");
 
-        final HTTPRequestHandler.Status stat = HTTPRequestHandler.Status.values()[status];
-
         if (callback != null) {
-            callback.onReceive(stat, ByteBuffer.wrap(result));
+            callback.onReceive(ByteBuffer.wrap(result));
         }
     }
 }
