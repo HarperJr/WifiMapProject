@@ -2,6 +2,7 @@ package h.maps.mapsproject.map;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
@@ -20,27 +21,32 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
+
 import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
+import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
 
 
 public class MapFragment extends Fragment implements LocationHandler.Callback {
     //Map here
+    private static final String REQ_ARGS = "&radius=4000&ie=UTF";
 
     private MapView mapView;
     private Handler mapHandler;
 
     private LocationMarker locationMarker;
-
     private SharedPreferences sharedPreferences;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mapHandler = new Handler();
+
         mapView = new MapView(inflater.getContext()) {
+
             @Override
             public boolean onGenericMotionEvent(MotionEvent event) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
@@ -65,9 +71,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
             public boolean onTouchEvent(MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN : {
-                        //float x = event.getX();
-                        //float y = event.getY();
-
+                        //Todo handle touches on map
                         break;
                     }
                 }
@@ -95,6 +99,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
 
         locationMarker = new LocationMarker(mapView);
         mapView.getOverlays().add(locationMarker);
+        mapView.getOverlays().add(new ScaleBarOverlay(mapView));
 
         mapView.setTileSource(TileSourceFactory.ROADS_OVERLAY_NL);
         mapView.setBuiltInZoomControls(false);
@@ -105,6 +110,10 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         mapView.getController().setZoom(7.0d);
 
         loadPreferences();
+
+        final Intent serviceIntent = new Intent(context, GlobalLocationService.class);
+
+        context.startService(serviceIntent);
     }
 
     @Override

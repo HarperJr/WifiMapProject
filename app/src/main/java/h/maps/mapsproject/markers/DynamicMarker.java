@@ -14,6 +14,11 @@ public class DynamicMarker extends MapMarker {
     }
 
     @Override
+    public void setProperties() {
+
+    }
+
+    @Override
     public void onLocationChanged(Location location) {
         super.onLocationChanged(location);
     }

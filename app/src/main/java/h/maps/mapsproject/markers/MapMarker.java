@@ -10,19 +10,22 @@ import h.maps.mapsproject.location.LocationHandler;
 /**
  * @author Maxim Berezin
  */
-public class MapMarker extends Marker implements LocationHandler.Callback {
+public abstract class MapMarker extends Marker implements LocationHandler.Callback {
 
     public MapMarker(MapView map) {
         super(map);
+        setProperties();
     }
+
+    public abstract void setProperties();
 
     @Override
     public void onLocationChanged(Location location) {
-        //Todo
+        //Todo update when my location changes
     }
 
     @Override
     public void onStatusChanged(String s) {
-        //Todo
+        //Todo update when my location status changes
     }
 }
