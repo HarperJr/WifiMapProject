@@ -4,4 +4,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="server_req">localhost:8000/global?task=getAll</string>
+    <string name="corrdinates">coords:</string>
+    <string name="permissions_toast">Требуется доступ к вашим геоданным</string>
 </resources>

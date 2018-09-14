@@ -34,7 +34,7 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String result = intent.getStringExtra("Result");
 
-        final Runnable packageHandelingThread = new Runnable() {
+        final Runnable packageHandlingThread = new Runnable() {
             @Override
             public void run() {
                 if (result != null) {
@@ -52,6 +52,6 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
             }
         };
 
-        globalHandler.post(packageHandelingThread);
+        globalHandler.post(packageHandlingThread);
     }
 }

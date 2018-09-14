@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (shouldRequest) {
                     requestPermissionsForLocationUpdates();
+                    Toast.makeText(this, getString(R.string.permissions_toast), Toast.LENGTH_LONG).show();
                 } else {
                     if (locationHandler == null) {
                         locationHandler = new LocationHandler(this, locationCallback);
