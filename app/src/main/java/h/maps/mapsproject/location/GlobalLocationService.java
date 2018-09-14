@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 
 public class GlobalLocationService extends IntentService {
 
-    public static final String NOTIFICATION = "h.maps.mapsproject.location.receiver";
+    public static final String NOTIFICATION = "h.maps.mapsproject.location.RECEIVE_GLOBAL";
 
     public GlobalLocationService() {
         super("GlobalLocationService");

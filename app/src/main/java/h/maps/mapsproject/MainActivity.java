@@ -1,6 +1,7 @@
 package h.maps.mapsproject;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.map.MapFragment;
 
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+
+        final Intent serviceIntent = new Intent(this, GlobalLocationService.class);
+        startService(serviceIntent);
     }
 
     private void requestPermissionsForLocationUpdates() {

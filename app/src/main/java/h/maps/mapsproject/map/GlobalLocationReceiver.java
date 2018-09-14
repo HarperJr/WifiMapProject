@@ -3,20 +3,27 @@ package h.maps.mapsproject.map;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 
-import java.nio.ByteBuffer;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import h.maps.mapsproject.http.HTTPRequestHandler;
+import h.maps.mapsproject.location.GlobalLocationListener;
 
 /**
  * @author Maxim Berezin
  */
 public class GlobalLocationReceiver extends BroadcastReceiver {
 
-    private final HTTPRequestHandler.Callback callback;
+    private GlobalLocationListener locationListener;
+    private Handler globalHandler;
 
-    public GlobalLocationReceiver(HTTPRequestHandler.Callback callback) {
-        this.callback = callback;
+    public GlobalLocationReceiver() {
+        globalHandler = new Handler();
+    }
+
+    public void setGlobalLocationListener(GlobalLocationListener locationListener) {
+        this.locationListener = locationListener;
     }
 
     /*
@@ -25,10 +32,26 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(Context context, Intent intent) {
-        final byte[] result = intent.getByteArrayExtra("Result");
+        final String result = intent.getStringExtra("Result");
 
-        if (callback != null) {
-            callback.onReceive(ByteBuffer.wrap(result));
-        }
+        final Runnable packageHandelingThread = new Runnable() {
+            @Override
+            public void run() {
+                if (result != null) {
+
+                    try {
+                        final JSONObject json = new JSONObject(result);
+                        //Process json
+                        if (locationListener != null) {
+                            locationListener.onReceiveGlobal(/*Model is required*/);
+                        }
+                    } catch (JSONException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        globalHandler.post(packageHandelingThread);
     }
 }

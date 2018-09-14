@@ -2,7 +2,6 @@ package h.maps.mapsproject.map;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
@@ -25,7 +24,6 @@ import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
-import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
 
@@ -110,10 +108,6 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         mapView.getController().setZoom(7.0d);
 
         loadPreferences();
-
-        final Intent serviceIntent = new Intent(context, GlobalLocationService.class);
-
-        context.startService(serviceIntent);
     }
 
     @Override
