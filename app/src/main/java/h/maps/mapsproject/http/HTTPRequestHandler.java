@@ -26,11 +26,9 @@ public class HTTPRequestHandler {
             connection.connect();
 
             try (BufferedInputStream stream = new BufferedInputStream(connection.getInputStream())) {
-                int result = stream.read();
-
-                while (result != -1) {
+                int result;
+                while ((result = stream.read()) != -1) {
                     bytes.write(result);
-                    result = stream.read();
                 }
 
             } catch (IOException ex) {

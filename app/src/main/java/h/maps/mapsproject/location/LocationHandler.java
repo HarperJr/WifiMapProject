@@ -31,14 +31,10 @@ public class LocationHandler {
     }
 
     public void startUpdates() throws SecurityException {
-        if (callback == null) {
+        if (callback == null || locationManager == null) {
             return;
         }
-
-        if (locationManager != null) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
-        }
-
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
     }
 
     public void stopUpdates() {
