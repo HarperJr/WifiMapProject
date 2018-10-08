@@ -77,6 +77,8 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
             }
         };
 
+        mapView.setTileSource(TileSourceFactory.ROADS_OVERLAY_NL);
+
         final View mapFragmentView = inflater.inflate(R.layout.fragment_osmmap, container, false);
         final FrameLayout mapLayout = mapFragmentView.findViewById(R.id.map_container);
 
@@ -99,7 +101,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         mapView.getOverlays().add(locationMarker);
         mapView.getOverlays().add(new ScaleBarOverlay(mapView));
 
-        mapView.setTileSource(TileSourceFactory.ROADS_OVERLAY_NL);
+
         mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
         mapView.setMinZoomLevel(MapConstant.MIN_ZOOM);
