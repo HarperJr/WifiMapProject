@@ -1,24 +1,27 @@
 package h.maps.mapsproject.location;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 
 /**
  * @author Maxim Berezin
  */
 public class LocationHandler {
 
-    private static final int MIN_TIME = 1000;
-    private static final int MIN_DISTANCE = 0;
+    private static final long MIN_TIME_INTERVAL = 1000;
 
-    private final Context context;
-    private final LocationManager locationManager;
+    private final Context context; //Unused for a while
+    private final FusedLocationProviderClient fusedLocationProviderClient;
+
+    private LocationRequest request;
 
     private Callback callback;
 
@@ -27,58 +30,48 @@ public class LocationHandler {
         void onStatusChanged(String s);
     }
 
-    public LocationHandler(Context context, Callback callback) {
+    public LocationHandler(Context context) {
         this.context = context;
+
+        request = new LocationRequest().setInterval(MIN_TIME_INTERVAL).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder settingsBuilder = new LocationSettingsRequest.Builder();
+        settingsBuilder.addLocationRequest(request);
+
+        final SettingsClient settingsClient = LocationServices.getSettingsClient(context);
+        settingsClient.checkLocationSettings(settingsBuilder.build());
+
+        this.fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
+    }
+
+    public LocationHandler setLocationUpdateCallback(Callback callback) {
         this.callback = callback;
-        this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return this;
     }
 
     public void startUpdates() throws SecurityException {
-        if (callback == null && locationManager == null) {
+        if (callback == null || fusedLocationProviderClient == null) {
             return;
         }
-        final boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-        if (isGPSEnabled) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, locationListener);
-            final Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location != null) {
-                callback.onLocationChanged(location);
-            }
-        } else {
-            Toast.makeText(context, "GPS provider disabled", Toast.LENGTH_LONG).show();
-        }
+        fusedLocationProviderClient.requestLocationUpdates(request, locationCallback, null);
     }
 
     public void stopUpdates() {
-        if (locationManager != null) {
-            locationManager.removeUpdates(locationListener);
-        }
+        if (fusedLocationProviderClient == null) return;
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
     }
 
-    private final LocationListener locationListener = new LocationListener() {
+    private final LocationCallback locationCallback = new LocationCallback() {
         @Override
-        public void onLocationChanged(Location location) {
-            Toast.makeText(context, "Update", Toast.LENGTH_LONG).show();
-            if (location != null) {
-                callback.onLocationChanged(location);
+        public void onLocationResult(LocationResult locationResult) {
+            if (locationResult == null) {
+                return;
             }
-        }
 
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-            callback.onStatusChanged(s);
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-            final Intent locationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            context.startActivity(locationIntent);
+            for (Location location : locationResult.getLocations()) {
+                if (location != null) {
+                    callback.onLocationChanged(location);
+                }
+            }
         }
     };
 

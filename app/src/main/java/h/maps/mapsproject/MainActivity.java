@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        locationHandler = new LocationHandler(this, locationCallback);
+        locationHandler = new LocationHandler(this).setLocationUpdateCallback(locationCallback);
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
         public void onLocationChanged(Location location) {
             if (mapFragment != null) {
                 mapFragment.onLocationChanged(location);
-                Toast.makeText(getApplicationContext(), "Location updates", Toast.LENGTH_LONG).show();
             }
         }
 
