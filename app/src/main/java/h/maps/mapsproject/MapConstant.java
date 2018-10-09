@@ -15,6 +15,6 @@ public class MapConstant {
     public static final String PREFS_SHOW_LOCATION = "showLocation";
     public static final String PREFS_SHOW_COMPASS = "showCompass";
 
-    public static final double MIN_ZOOM = 18.0d;
+    public static final double MIN_ZOOM = 3.0d;
     public static final double MAX_ZOOM = 23.0d;
 }

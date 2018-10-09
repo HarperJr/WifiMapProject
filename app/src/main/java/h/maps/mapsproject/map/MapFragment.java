@@ -15,9 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import android.widget.Toast;
+import h.maps.mapsproject.markers.MapMarker;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -32,6 +35,8 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
     //Map here
     private static final String REQ_ARGS = "&radius=4000&ie=UTF";
 
+    private boolean needsUpdate;
+
     private MapView mapView;
     private Handler mapHandler;
 
@@ -42,17 +47,21 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mapHandler = new Handler();
+        needsUpdate = true;
 
-        mapView = new MapView(inflater.getContext()) {
+        mapView = new MapView(inflater.getContext());
+        mapView.setTileSource(new XYTileSource("OpenCycleMap", (int) MapConstant.MIN_ZOOM, (int) MapConstant.MAX_ZOOM,
+                256, ".png", new String[] { "http://tile.thunderforest.com/cycle/" }));
+        mapView.setTilesScaledToDpi(true);
+
+        mapView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
 
             @Override
-            public boolean onGenericMotionEvent(MotionEvent event) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD
-                        && 0 != (event.getSource() & InputDevice.SOURCE_CLASS_POINTER)) {
+            public boolean onGenericMotion(View view, MotionEvent event) {
+                if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
                     switch (event.getAction()) {
                         case MotionEvent.ACTION_SCROLL:
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1
-                                    && event.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f)
+                            if (event.getAxisValue(MotionEvent.AXIS_VSCROLL) < 0.0f)
                                 mapView.getController().zoomOut();
                             else {
                                 IGeoPoint iGeoPoint = mapView.getProjection().fromPixels((int) event.getX(), (int) event.getY());
@@ -64,23 +73,26 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
                 }
                 return false;
             }
+        });
 
+        mapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouchEvent(MotionEvent event) {
+            public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN : {
                         //Todo handle touches on map
                         break;
                     }
                 }
-                return mapView.performClick();
+                return v.performClick();
             }
-        };
+        });
 
-        mapView.setTileSource(TileSourceFactory.ROADS_OVERLAY_NL);
+        mapView.setBuiltInZoomControls(false);
+        mapView.setMultiTouchControls(true);
 
         final View mapFragmentView = inflater.inflate(R.layout.fragment_osmmap, container, false);
-        final FrameLayout mapLayout = mapFragmentView.findViewById(R.id.map_container);
+        final FrameLayout mapLayout = (FrameLayout) mapFragmentView.findViewById(R.id.map_container);
 
         if (mapLayout != null) {
             mapLayout.addView(mapView);
@@ -101,9 +113,6 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         mapView.getOverlays().add(locationMarker);
         mapView.getOverlays().add(new ScaleBarOverlay(mapView));
 
-
-        mapView.setBuiltInZoomControls(false);
-        mapView.setMultiTouchControls(true);
         mapView.setMinZoomLevel(MapConstant.MIN_ZOOM);
         mapView.setMaxZoomLevel(MapConstant.MAX_ZOOM);
 
@@ -169,11 +178,23 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
 
     @Override
     public void onLocationChanged(Location location) {
-        if (locationMarker != null) locationMarker.onLocationChanged(location);
+        if (locationMarker != null) {
+            locationMarker.onLocationChanged(location);
+            if (needsUpdate) {
+                mapView.getController().animateTo(new GeoPoint(location.getLatitude()
+                        , location.getLongitude()));
+                needsUpdate = false;
+            }
+        }
     }
 
     @Override
     public void onStatusChanged(String s) {
 
     }
+
+    public MapView getMapView() {
+        return mapView;
+    }
+
 }

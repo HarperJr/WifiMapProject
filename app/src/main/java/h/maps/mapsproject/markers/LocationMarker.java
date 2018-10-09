@@ -2,6 +2,7 @@ package h.maps.mapsproject.markers;
 
 import android.location.Location;
 
+import h.maps.mapsproject.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
@@ -16,7 +17,12 @@ public class LocationMarker extends MapMarker {
 
     @Override
     public void setProperties() {
+        setSnippet("My location");
+    }
 
+    @Override
+    protected int selectIcon() {
+        return R.drawable.person;
     }
 
     @Override
