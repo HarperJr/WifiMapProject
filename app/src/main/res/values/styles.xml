@@ -7,9 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
     <style name="AppTheme.Custom" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/main_logo</item>
+        <item name="android:windowBackground">@drawable/splash</item>
     </style>
-
 </resources>
