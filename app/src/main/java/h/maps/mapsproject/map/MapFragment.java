@@ -1,7 +1,10 @@
 package h.maps.mapsproject.map;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,36 +24,51 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
+import h.maps.mapsproject.location.GlobalLocationListener;
+import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
 import h.maps.mapsproject.overlays.CustomOverlay;
 
 
-public class MapFragment extends Fragment implements LocationHandler.Callback {
-    //Map here
-    private static final String REQ_ARGS = "&radius=4000&ie=UTF";
+public class MapFragment extends Fragment implements LocationHandler.Callback, GlobalLocationListener{
 
     private CustomOverlay customOverlay;
     private boolean needsUpdate;
 
+    private Context context;
     private MapView mapView;
 
     private LocationMarker locationMarker;
     private SharedPreferences sharedPreferences;
 
+    private final BroadcastReceiver globalLocationsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final Object locationExtras = intent.getExtras().get(GlobalLocationService.EXTRA_LOCATIONS_LIST);
+
+            if (locationExtras != null && locationExtras instanceof ArrayList) {
+                final List<Location> locations = (ArrayList<Location>) locationExtras;
+                onReceiveGlobal(locations);
+            }
+        }
+    };
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        needsUpdate = true;
+        context = getActivity();
 
         mapView = new MapView(inflater.getContext());
 
         mapView.setTileSource(new XYTileSource("OpenCycleMap", (int) MapConstant.MIN_ZOOM, (int) MapConstant.MAX_ZOOM,
                 256, ".png", new String[] { "http://tile.thunderforest.com/cycle/" }));
         mapView.setTilesScaledToDpi(true);
-
         mapView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
 
             @Override
@@ -77,11 +95,18 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN : {
-
+                        //Close panel if opened
                         break;
                     }
                 }
                 return v.performClick();
+            }
+        });
+
+        mapView.addOnFirstLayoutListener(new MapView.OnFirstLayoutListener() {
+            @Override
+            public void onFirstLayout(View v, int left, int top, int right, int bottom) {
+                context.registerReceiver(globalLocationsReceiver, new IntentFilter(GlobalLocationService.RECEIVE_GLOBAL));
             }
         });
 
@@ -94,6 +119,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
 
         if (mapLayout != null) {
             mapLayout.addView(mapView);
+            needsUpdate = true;
         }
 
         return mapFragmentView;
@@ -102,8 +128,6 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        final Context context = getActivity();
 
         sharedPreferences = context.getSharedPreferences(MapConstant.PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -146,6 +170,9 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         edit.putString(MapConstant.PREFS_LONGITUDE_STRING, String.valueOf(mapView.getMapCenter().getLongitude()));
         edit.putString(MapConstant.PREFS_ZOOM_LEVEL_STRING, String.valueOf(mapView.getZoomLevelDouble()));
         edit.apply();
+
+        needsUpdate = true;
+
         mapView.onPause();
     }
 
@@ -193,8 +220,16 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
 
     }
 
+    @Override
+    public void onReceiveGlobal(List<Location> locations) {
+        //Process and update
+    }
+
     public MapView getMapView() {
         return mapView;
     }
 
+    public boolean isNeedsUpdate() {
+        return needsUpdate;
+    }
 }

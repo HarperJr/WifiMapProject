@@ -58,6 +58,7 @@ public class TraasHandler {
                 location = locationsGlobal.get(id);
             }
 
+            //Location updates
             location.setLongitude(position.x);
             location.setLatitude(position.y);
             location.setSpeed((float) speed);
