@@ -2,9 +2,10 @@ package h.maps.mapsproject.markers;
 
 import android.location.Location;
 
-import h.maps.mapsproject.R;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+
+import h.maps.mapsproject.R;
 
 /**
  * @author Maxim Berezin

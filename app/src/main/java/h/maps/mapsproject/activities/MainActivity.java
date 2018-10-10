@@ -20,11 +20,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import h.maps.mapsproject.R;
+import h.maps.mapsproject.location.GlobalLocationListener;
 import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.map.MapFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GlobalLocationListener{
 
     private static final List<String> PERMS;
     private static final int REQ_CODE = 0x1001;
@@ -42,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+    };
+
+    private final BroadcastReceiver globalLocationsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            intent.getExtras().get("VehiclesData");
         }
     };
 
@@ -141,4 +149,8 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    public void onReceiveGlobal(List<Location> locations) {
+        //todo update map
+    }
 }

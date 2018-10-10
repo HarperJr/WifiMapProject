@@ -4,9 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.InputDevice;
 import android.view.LayoutInflater;
@@ -15,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import android.widget.Toast;
-import h.maps.mapsproject.markers.MapMarker;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -29,16 +25,17 @@ import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
+import h.maps.mapsproject.overlays.CustomOverlay;
 
 
 public class MapFragment extends Fragment implements LocationHandler.Callback {
     //Map here
     private static final String REQ_ARGS = "&radius=4000&ie=UTF";
 
+    private CustomOverlay customOverlay;
     private boolean needsUpdate;
 
     private MapView mapView;
-    private Handler mapHandler;
 
     private LocationMarker locationMarker;
     private SharedPreferences sharedPreferences;
@@ -46,10 +43,10 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        mapHandler = new Handler();
         needsUpdate = true;
 
         mapView = new MapView(inflater.getContext());
+
         mapView.setTileSource(new XYTileSource("OpenCycleMap", (int) MapConstant.MIN_ZOOM, (int) MapConstant.MAX_ZOOM,
                 256, ".png", new String[] { "http://tile.thunderforest.com/cycle/" }));
         mapView.setTilesScaledToDpi(true);
@@ -80,7 +77,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN : {
-                        //Todo handle touches on map
+
                         break;
                     }
                 }
@@ -90,9 +87,10 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
 
         mapView.setBuiltInZoomControls(false);
         mapView.setMultiTouchControls(true);
+        mapView.setClickable(true);
 
         final View mapFragmentView = inflater.inflate(R.layout.fragment_osmmap, container, false);
-        final FrameLayout mapLayout = (FrameLayout) mapFragmentView.findViewById(R.id.map_container);
+        final FrameLayout mapLayout = mapFragmentView.findViewById(R.id.map_container);
 
         if (mapLayout != null) {
             mapLayout.addView(mapView);
@@ -119,6 +117,8 @@ public class MapFragment extends Fragment implements LocationHandler.Callback {
         mapView.getController().setZoom(7.0d);
 
         loadPreferences();
+
+        customOverlay = new CustomOverlay(mapView);
     }
 
     @Override
