@@ -17,20 +17,10 @@ import it.polito.appeal.traci.SumoTraciConnection;
  * @author Maxim Berezin
  */
 public class TraasHandler {
-
-    private List<Location> locationsGlobal = new ArrayList<>();
-
     private SumoTraciConnection connection;
-    private float timeStep;
-    private float currentTimeStep;
-
-    public TraasHandler() {
-        this.timeStep = 0f;
-        this.currentTimeStep = 0f;
-    }
 
     public void connect(String host, int port) throws Exception {
-        connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(String.format("http://%s/SUMO?wsdl", host)), port));
+        connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(host), port));
         try {
             connection.do_timestep();
         } catch (NullPointerException ex) {
@@ -39,44 +29,37 @@ public class TraasHandler {
     }
 
     public TraasHandler withTimeStep(float timeStep) {
-        this.timeStep = timeStep;
         connection.addOption("step-length", new StringBuilder().append(timeStep).toString());
         return this;
     }
 
-    public List<Location> getAllVehicles() throws Exception {
-        for(String idListElement : (SumoStringList)connection.do_job_get(Vehicle.getIDList())) {
+    public ArrayList<Location> getAll() throws Exception {
+        final ArrayList<Location> locations = new ArrayList<>();
 
-            double speed = (double)connection.do_job_get(Vehicle.getSpeed(idListElement));
-            SumoPosition2D position = (SumoPosition2D)connection.do_job_get(Vehicle.getPosition(idListElement));
+        if (connection != null && !connection.isClosed()) {
+            for(final String idListElement : (SumoStringList)connection.do_job_get(Vehicle.getIDList())) {
 
-            final int id = Integer.parseInt(idListElement);
-            final Location location;
-            if (locationsGlobal.size() <= id) {
-                location = new Location(LocationManager.NETWORK_PROVIDER);
-            } else {
-                location = locationsGlobal.get(id);
+                float speed = (float) connection.do_job_get(Vehicle.getSpeed(idListElement));
+                SumoPosition2D position = (SumoPosition2D)connection.do_job_get(Vehicle.getPosition(idListElement));
+
+                final Location location = new Location(LocationManager.NETWORK_PROVIDER);
+
+                location.setLatitude(position.x);
+                location.setLongitude(position.y);
+                location.setSpeed(speed);
+
+                locations.add(location);
             }
-
-            //Location updates
-            location.setLongitude(position.x);
-            location.setLatitude(position.y);
-            location.setSpeed((float) speed);
         }
 
-        return locationsGlobal;
+        return locations;
     }
 
     public void doTimeStep() throws Exception {
-        currentTimeStep += timeStep;
         try {
             connection.do_timestep();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    public float getCurrentTimeStep() {
-        return currentTimeStep;
     }
 }

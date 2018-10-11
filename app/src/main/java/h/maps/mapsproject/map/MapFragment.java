@@ -1,5 +1,6 @@
 package h.maps.mapsproject.map;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -59,6 +60,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
         }
     };
 
+    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {

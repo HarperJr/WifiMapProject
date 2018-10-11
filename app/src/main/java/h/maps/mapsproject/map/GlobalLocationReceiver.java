@@ -43,7 +43,7 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
                         final JSONObject json = new JSONObject(result);
                         //Process json
                         if (locationListener != null) {
-                            locationListener.onReceiveGlobal(/*Model is required*/);
+                            //locationListener.onReceiveGlobal(/*Model is required*/);
                         }
                     } catch (JSONException ex) {
                         ex.printStackTrace();

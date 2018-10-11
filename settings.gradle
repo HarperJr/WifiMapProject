@@ -1,1 +1,1 @@
-include ':app', ':TraaS'
+include ':app'

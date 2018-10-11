@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         if (locationHandler != null) {
             locationHandler.startUpdates();
         }
+        startService(new Intent(GlobalLocationService.GlOBAL_LOCATIONS_UPDATE_SERVICE));
     }
 
     private LocationHandler.Callback locationCallback = new LocationHandler.Callback() {
