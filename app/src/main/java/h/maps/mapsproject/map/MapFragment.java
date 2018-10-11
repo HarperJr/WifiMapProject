@@ -1,5 +1,6 @@
 package h.maps.mapsproject.map;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -47,18 +49,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
     private LocationMarker locationMarker;
     private SharedPreferences sharedPreferences;
 
-    private final BroadcastReceiver globalLocationsReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final Object locationExtras = intent.getExtras().get(GlobalLocationService.EXTRA_LOCATIONS_LIST);
-
-            if (locationExtras != null && locationExtras instanceof ArrayList) {
-                final List<Location> locations = (ArrayList<Location>) locationExtras;
-                onReceiveGlobal(locations);
-            }
-        }
-    };
-
+    @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -106,7 +97,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
         mapView.addOnFirstLayoutListener(new MapView.OnFirstLayoutListener() {
             @Override
             public void onFirstLayout(View v, int left, int top, int right, int bottom) {
-                context.registerReceiver(globalLocationsReceiver, new IntentFilter(GlobalLocationService.RECEIVE_GLOBAL));
+                startGlobalLocationUpdatesService();
             }
         });
 
@@ -203,6 +194,20 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
         }
     }
 
+    public void startGlobalLocationUpdatesService() {
+        final Bundle bundle = new Bundle();
+
+        bundle.putString("host", getString(R.string.host));
+        bundle.putInt("port", Integer.parseInt(getString(R.string.port)));
+        bundle.putFloat("timeStep", 0.2f);
+        bundle.putLong("updateMills", 2000L);
+
+        final Intent globalLocationUpdatesServiceIntent = new Intent(context, GlobalLocationService.class);
+        globalLocationUpdatesServiceIntent.putExtras(bundle);
+
+        context.startService(globalLocationUpdatesServiceIntent);
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         if (locationMarker != null) {
@@ -222,7 +227,7 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
     @Override
     public void onReceiveGlobal(List<Location> locations) {
-        //Process and update
+        Toast.makeText(context, "Received global", Toast.LENGTH_LONG).show();
     }
 
     public MapView getMapView() {

@@ -45,6 +45,25 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private final BroadcastReceiver globalLocationsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final Bundle bundle = intent.getExtras();
+            final Object locationExtras = bundle.get(GlobalLocationService.EXTRA_LOCATIONS_LIST);
+
+            if (locationExtras != null) {
+                final List<Location> locations = (ArrayList<Location>) locationExtras;
+                if (mapFragment != null) {
+                    mapFragment.onReceiveGlobal(locations);
+                }
+            } else {
+                if (context != null) {
+                    Toast.makeText(context, "Cannot receive global updates", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,12 +71,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(globalLocationsReceiver, new IntentFilter(GlobalLocationService.RECEIVE_GLOBAL_UPDATES));
+
         locationHandler = new LocationHandler(this).setLocationUpdateCallback(locationCallback);
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-
-        final Intent serviceIntent = new Intent(this, GlobalLocationService.class);
-        startService(serviceIntent);
     }
 
     private void requestPermissionsForLocationUpdates() {
