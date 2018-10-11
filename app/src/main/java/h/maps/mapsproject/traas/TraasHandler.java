@@ -6,7 +6,6 @@ import android.location.LocationManager;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.ws.container.SumoPosition2D;
@@ -18,9 +17,11 @@ import it.polito.appeal.traci.SumoTraciConnection;
  */
 public class TraasHandler {
     private SumoTraciConnection connection;
+    private float timeStep;
 
     public void connect(String host, int port) throws Exception {
         connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(host), port));
+        connection.addOption("step-length", new StringBuilder().append(timeStep).toString());
         try {
             connection.do_timestep();
         } catch (NullPointerException ex) {
@@ -29,7 +30,7 @@ public class TraasHandler {
     }
 
     public TraasHandler withTimeStep(float timeStep) {
-        connection.addOption("step-length", new StringBuilder().append(timeStep).toString());
+        this.timeStep = timeStep;
         return this;
     }
 
