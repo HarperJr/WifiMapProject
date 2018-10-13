@@ -7,18 +7,18 @@
     tools:context=".activities.MainActivity">
 
     <fragment
-        android:id="@+id/upper_panel"
-        android:name="h.maps.mapsproject.UpperPanelFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        tools:layout="@layout/fragment_upper_panel"/>
-
-    <fragment
         android:id="@+id/map"
         android:name="h.maps.mapsproject.map.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_osmmap"/>
+
+    <fragment
+        android:id="@+id/info_panel"
+        android:name="h.maps.mapsproject.UpperPanelFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        tools:layout="@layout/fragment_infopanel" />
 
 </RelativeLayout>

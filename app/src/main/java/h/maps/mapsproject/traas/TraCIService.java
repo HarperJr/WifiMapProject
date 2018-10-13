@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
+import de.tudresden.sumo.cmd.Simulation;
 import de.tudresden.sumo.cmd.Vehicle;
 import de.tudresden.ws.container.SumoPosition2D;
 import de.tudresden.ws.container.SumoStringList;
@@ -15,21 +16,32 @@ import it.polito.appeal.traci.SumoTraciConnection;
 /**
  * @author Maxim Berezin
  */
-public class TraasHandler {
+public class TraCIService {
+    private static TraCIService serviceInstance;
+
     private SumoTraciConnection connection;
     private float timeStep;
 
+    public static TraCIService getInstance() {
+        if (serviceInstance == null) {
+            serviceInstance = new TraCIService();
+        }
+        return serviceInstance;
+    }
+
     public void connect(String host, int port) throws Exception {
         connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(host), port));
-        connection.addOption("step-length", new StringBuilder().append(timeStep).toString());
-        try {
+
+        setTimeStep(0.2f);
+
+        if (connection != null) {
+            //Waiting for response
+            connection.addOption("step-length", Float.toString(timeStep));
             connection.do_timestep();
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
         }
     }
 
-    public TraasHandler withTimeStep(float timeStep) {
+    public TraCIService setTimeStep(float timeStep) {
         this.timeStep = timeStep;
         return this;
     }
@@ -40,14 +52,15 @@ public class TraasHandler {
         if (connection != null && !connection.isClosed()) {
             for(final String idListElement : (SumoStringList)connection.do_job_get(Vehicle.getIDList())) {
 
-                float speed = (float) connection.do_job_get(Vehicle.getSpeed(idListElement));
-                SumoPosition2D position = (SumoPosition2D)connection.do_job_get(Vehicle.getPosition(idListElement));
+                final double speed = (double) connection.do_job_get(Vehicle.getSpeed(idListElement));
+
+                final SumoPosition2D coordinates = (SumoPosition2D) connection.do_job_get(Vehicle.getPosition(idListElement));
+                final SumoPosition2D position = (SumoPosition2D) connection.do_job_get(Simulation.convertGeo(coordinates.x, coordinates.y, false));
 
                 final Location location = new Location(LocationManager.NETWORK_PROVIDER);
-
                 location.setLatitude(position.x);
                 location.setLongitude(position.y);
-                location.setSpeed(speed);
+                location.setSpeed((float) speed);
 
                 locations.add(location);
             }
@@ -57,10 +70,8 @@ public class TraasHandler {
     }
 
     public void doTimeStep() throws Exception {
-        try {
+        if (connection != null) {
             connection.do_timestep();
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }

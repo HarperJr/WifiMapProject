@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import h.maps.mapsproject.R;
-import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.map.MapFragment;
 

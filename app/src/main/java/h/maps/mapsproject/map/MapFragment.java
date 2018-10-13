@@ -2,10 +2,8 @@ package h.maps.mapsproject.map;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -25,14 +23,11 @@ import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
 import h.maps.mapsproject.location.GlobalLocationListener;
-import h.maps.mapsproject.location.GlobalLocationService;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
 import h.maps.mapsproject.overlays.CustomOverlay;
@@ -91,13 +86,6 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
                     }
                 }
                 return v.performClick();
-            }
-        });
-
-        mapView.addOnFirstLayoutListener(new MapView.OnFirstLayoutListener() {
-            @Override
-            public void onFirstLayout(View v, int left, int top, int right, int bottom) {
-                startGlobalLocationUpdatesService();
             }
         });
 
@@ -192,20 +180,6 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
             mapView.setExpectedCenter(new GeoPoint(latitude, longitude));
         }
-    }
-
-    public void startGlobalLocationUpdatesService() {
-        final Bundle bundle = new Bundle();
-
-        bundle.putString("host", getString(R.string.host));
-        bundle.putInt("port", Integer.parseInt(getString(R.string.port)));
-        bundle.putFloat("timeStep", 0.2f);
-        bundle.putLong("updateMills", 2000L);
-
-        final Intent globalLocationUpdatesServiceIntent = new Intent(context, GlobalLocationService.class);
-        globalLocationUpdatesServiceIntent.putExtras(bundle);
-
-        context.startService(globalLocationUpdatesServiceIntent);
     }
 
     @Override
