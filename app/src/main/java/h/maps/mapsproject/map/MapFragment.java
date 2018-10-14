@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
@@ -21,6 +22,7 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import java.util.List;
@@ -30,12 +32,10 @@ import h.maps.mapsproject.R;
 import h.maps.mapsproject.location.GlobalLocationListener;
 import h.maps.mapsproject.location.LocationHandler;
 import h.maps.mapsproject.markers.LocationMarker;
-import h.maps.mapsproject.overlays.CustomOverlay;
 
 
 public class MapFragment extends Fragment implements LocationHandler.Callback, GlobalLocationListener{
 
-    private CustomOverlay customOverlay;
     private boolean needsUpdate;
 
     private Context context;
@@ -44,17 +44,18 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
     private LocationMarker locationMarker;
     private SharedPreferences sharedPreferences;
 
-    @SuppressLint("ClickableViewAccessibility")
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         context = getActivity();
 
         mapView = new MapView(inflater.getContext());
 
-        mapView.setTileSource(new XYTileSource("OpenCycleMap", (int) MapConstant.MIN_ZOOM, (int) MapConstant.MAX_ZOOM,
-                256, ".png", new String[] { "http://tile.thunderforest.com/cycle/" }));
+        ITileSource tileSource = new XYTileSource("OpenCycleMap", (int) MapConstant.MIN_ZOOM, (int) MapConstant.MAX_ZOOM,
+                256, ".png", new String[] { "http://tile.thunderforest.com/cycle/" });
+
+        mapView.setTileSource(tileSource);
         mapView.setTilesScaledToDpi(true);
+
         mapView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
 
             @Override
@@ -76,16 +77,10 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
             }
         });
 
-        mapView.setOnTouchListener(new View.OnTouchListener() {
+        mapView.addOnFirstLayoutListener(new MapView.OnFirstLayoutListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN : {
-                        //Close panel if opened
-                        break;
-                    }
-                }
-                return v.performClick();
+            public void onFirstLayout(View v, int left, int top, int right, int bottom) {
+
             }
         });
 
@@ -98,8 +93,29 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
         if (mapLayout != null) {
             mapLayout.addView(mapView);
+
             needsUpdate = true;
         }
+
+        final FrameLayout buttonsGroupLayout = mapFragmentView.findViewById(R.id.buttonsGroup);
+        buttonsGroupLayout.findViewById(R.id.zoomIn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapView.getController().zoomIn();
+            }
+        });
+        buttonsGroupLayout.findViewById(R.id.zoomOut).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapView.getController().zoomOut();
+            }
+        });
+        buttonsGroupLayout.findViewById(R.id.toSelf).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mapView.getController().animateTo(locationMarker.getPosition());
+            }
+        });
 
         return mapFragmentView;
     }
@@ -112,16 +128,17 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
         locationMarker = new LocationMarker(mapView);
         mapView.getOverlays().add(locationMarker);
-        mapView.getOverlays().add(new ScaleBarOverlay(mapView));
+
+        final ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
+        scaleBarOverlay.setScaleBarOffset(16, 64);
+
+        mapView.getOverlays().add(scaleBarOverlay);
 
         mapView.setMinZoomLevel(MapConstant.MIN_ZOOM);
         mapView.setMaxZoomLevel(MapConstant.MAX_ZOOM);
 
-        mapView.getController().setZoom(7.0d);
-
         loadPreferences();
 
-        customOverlay = new CustomOverlay(mapView);
     }
 
     @Override
@@ -201,7 +218,9 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
     @Override
     public void onReceiveGlobal(List<Location> locations) {
-        Toast.makeText(context, "Received global", Toast.LENGTH_LONG).show();
+        for (Location location : locations) {
+
+        }
     }
 
     public MapView getMapView() {

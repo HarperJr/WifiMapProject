@@ -15,40 +15,38 @@
     </FrameLayout>
 
     <FrameLayout
+        android:id="@+id/buttonsGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/info_panel"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="122dp"
+        android:layout_marginTop="199dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="48dp">
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/zoomIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/map_button"
-            android:contentDescription="zoom+"
-            android:src="@drawable/zoom_in" />
+            android:background="@drawable/round_button"
+            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/zoomOut"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="76dp"
-            android:background="@drawable/map_button"
-            android:contentDescription="zoom-"
-            android:src="@drawable/zoom_out" />
+            android:background="@drawable/round_button"
+            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/toSelf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="180dp"
-            android:background="@drawable/map_button"
-            android:contentDescription="toSelf"
-            android:src="@drawable/person" />
+            android:background="@drawable/round_button"
+            android:contentDescription="TODO"
+            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
 
     </FrameLayout>
 </RelativeLayout>

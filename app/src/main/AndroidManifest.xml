@@ -30,15 +30,8 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".activities.EgreementActivity">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-        </activity>
-
         <receiver
-            android:name=".map.GlobalLocationReceiver"
+            android:name=".location.GlobalLocationReceiver"
             android:enabled="false"
             android:exported="false">
             <intent-filter>

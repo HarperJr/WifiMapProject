@@ -10,5 +10,6 @@
     <string name="logo_title">TRACKER</string>
     <string name="logo_splash">Splash of logo</string>
     <string name="version">traff application v 0.02</string>
+    <string name="speed">Speed:</string>
 
 </resources>

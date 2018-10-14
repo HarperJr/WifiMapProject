@@ -1,4 +1,4 @@
-package h.maps.mapsproject.map;
+package h.maps.mapsproject.location;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -43,7 +43,7 @@ public class GlobalLocationReceiver extends BroadcastReceiver {
                         final JSONObject json = new JSONObject(result);
                         //Process json
                         if (locationListener != null) {
-                            //locationListener.onReceiveGlobal(/*Model is required*/);
+
                         }
                     } catch (JSONException ex) {
                         ex.printStackTrace();

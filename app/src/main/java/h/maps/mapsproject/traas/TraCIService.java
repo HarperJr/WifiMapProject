@@ -20,7 +20,7 @@ public class TraCIService {
     private static TraCIService serviceInstance;
 
     private SumoTraciConnection connection;
-    private float timeStep;
+    private String timeStep;
 
     public static TraCIService getInstance() {
         if (serviceInstance == null) {
@@ -32,16 +32,16 @@ public class TraCIService {
     public void connect(String host, int port) throws Exception {
         connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(host), port));
 
-        setTimeStep(0.2f);
+        setTimeStep("0.2");
 
         if (connection != null) {
             //Waiting for response
-            connection.addOption("step-length", Float.toString(timeStep));
+            connection.addOption("step-length", timeStep);
             connection.do_timestep();
         }
     }
 
-    public TraCIService setTimeStep(float timeStep) {
+    public TraCIService setTimeStep(String timeStep) {
         this.timeStep = timeStep;
         return this;
     }
@@ -58,7 +58,8 @@ public class TraCIService {
                 final SumoPosition2D position = (SumoPosition2D) connection.do_job_get(Simulation.convertGeo(coordinates.x, coordinates.y, false));
 
                 final Location location = new Location(LocationManager.NETWORK_PROVIDER);
-                location.setLatitude(position.x);
+
+                 location.setLatitude(position.x);
                 location.setLongitude(position.y);
                 location.setSpeed((float) speed);
 
