@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/top_round_layout"
-    android:elevation="6dp"
-    tools:context=".UpperPanelFragment">
+    tools:context=".fragments.UpperPanelFragment">
     <!-- TODO: Update blank fragment layout -->
 
     <LinearLayout
@@ -15,14 +13,16 @@
         android:layout_height="match_parent"
         android:gravity="clip_horizontal"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="visible"
+        android:background="@drawable/top_round_layout"
+        android:elevation="4dp">
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/toggler"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:src="@drawable/toggler" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -78,7 +78,8 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:layout_gravity="left"
-                android:src="#DDD" />
+                android:src="#DDD"
+                app:srcCompat="@drawable/car_drawable" />
 
             <ImageView
                 android:id="@+id/imageView"

@@ -38,11 +38,11 @@
                 <action android:name="h.maps.mapsproject.location.RECEIVE_GLOBAL" />
             </intent-filter>
         </receiver>
-        <service
-            android:name=".location.GlobalUpdatesService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false"
-            />
+        <service android:name=".location.GlobalLocationIntentService">
+            <intent-filter>
+                <action android:name="h.maps.mapsproject.ACTION_REQUEST_GLOBAL"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

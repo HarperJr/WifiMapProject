@@ -1,52 +1,74 @@
 package h.maps.mapsproject.overlays;
 
-import android.graphics.Point;
+import android.graphics.Canvas;
+import android.location.Location;
+import android.view.MotionEvent;
 
-import org.osmdroid.api.IMapView;
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.ItemizedOverlay;
-import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Overlay;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-import h.maps.mapsproject.R;
+import h.maps.mapsproject.markers.DynamicMarker;
 
-/**
- * @author Maxim Berezin
- */
-public class CustomOverlay extends ItemizedOverlay<OverlayItem> {
-    private List<OverlayItem> items = new ArrayList<>();
+public class CustomOverlay extends Overlay {
 
-    public CustomOverlay(MapView map) {
-        super(map.getContext().getDrawable(R.drawable.direction_arrow));
+    private final MapView mapView;
+    private final List<DynamicMarker> markers = new LinkedList<>();
+
+    public CustomOverlay(MapView mapView) {
+        this.mapView = mapView;
     }
 
-    public void addOverlay(OverlayItem item) {
-        if (items.contains(item)) return;
-        items.add(item);
-        populate();
-    }
-
-    public void removeOverlay(OverlayItem item) {
-        if (!items.contains(item)) return;
-        items.remove(item);
-        populate();
-    }
-
-    @Override
-    protected OverlayItem createItem(int i) {
-        return items.get(i);
-    }
-
-    @Override
     public int size() {
-        return items.size();
+        return markers.size();
+    }
+
+    public boolean addMarker(Location location) {
+        final DynamicMarker marker = new DynamicMarker(mapView);
+        marker.setPosition(new GeoPoint(location.getLatitude(), location.getLongitude()));
+        return markers.add(marker);
+    }
+
+    public boolean removeMarker(int i) {
+        if (i < size()) {
+            return markers.remove(i) != null;
+        }
+        return false;
+    }
+
+    public DynamicMarker getMarker(int i) {
+        if (i < size()) {
+            return markers.get(i);
+        }
+        return null;
     }
 
     @Override
-    public boolean onSnapToItem(int x, int y, Point snapPoint, IMapView mapView) {
+    public void draw(Canvas c, MapView osmv, boolean shadow) {
+        for (DynamicMarker marker : markers) {
+            if (marker != null) {
+                marker.draw(c, osmv, shadow);
+            }
+        }
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e, MapView mapView) {
+
+        for (DynamicMarker marker : markers) {
+            if (marker != null) {
+                if (marker.onDoubleTap(e, mapView)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 }
+
+

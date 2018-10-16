@@ -20,14 +20,12 @@ public abstract class MapMarker extends Marker implements LocationHandler.Callba
         this.map = map;
 
         setProperties();
-        setIcon(map.getContext().getDrawable(selectIcon()));
+        setIcon(map.getContext().getDrawable(getIconImage()));
     }
 
     public abstract void setProperties();
 
-    protected int selectIcon() {
-        return R.drawable.moreinfo_arrow;
-    }
+    public abstract int getIconImage();
 
     @Override
     public void onLocationChanged(Location location) {

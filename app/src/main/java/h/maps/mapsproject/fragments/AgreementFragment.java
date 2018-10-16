@@ -1,4 +1,4 @@
-package h.maps.mapsproject;
+package h.maps.mapsproject.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,16 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import h.maps.mapsproject.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FragmentEgreement.OnFragmentInteractionListener} interface
+ * {@link AgreementFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FragmentEgreement#newInstance} factory method to
+ * Use the {@link AgreementFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentEgreement extends Fragment {
+public class AgreementFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +31,7 @@ public class FragmentEgreement extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public FragmentEgreement() {
+    public AgreementFragment() {
         // Required empty public constructor
     }
 
@@ -39,11 +41,11 @@ public class FragmentEgreement extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FragmentEgreement.
+     * @return A new instance of fragment AgreementFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FragmentEgreement newInstance(String param1, String param2) {
-        FragmentEgreement fragment = new FragmentEgreement();
+    public static AgreementFragment newInstance(String param1, String param2) {
+        AgreementFragment fragment = new AgreementFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

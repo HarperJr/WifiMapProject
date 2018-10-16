@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".fragments.MapFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -11,42 +11,59 @@
         android:id="@+id/map_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/buttonsGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_above="@+id/bottom_container"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="199dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="48dp">
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="24dp">
 
         <ImageButton
             android:id="@+id/zoomIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/round_button"
-            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
+            android:elevation="4dp"
+            android:src="@drawable/arrow_up" />
 
         <ImageButton
             android:id="@+id/zoomOut"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="76dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="60dp"
             android:background="@drawable/round_button"
-            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
+            android:elevation="4dp"
+            android:src="@drawable/arrow_down" />
 
         <ImageButton
             android:id="@+id/toSelf"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="180dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginTop="160dp"
+            android:layout_marginBottom="8dp"
             android:background="@drawable/round_button"
-            android:contentDescription="TODO"
-            android:src="@drawable/common_google_signin_btn_icon_light_normal_background" />
+            android:elevation="4dp"
+            android:src="@drawable/person" />
 
     </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/bottom_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true">
+    </FrameLayout>
+
 </RelativeLayout>

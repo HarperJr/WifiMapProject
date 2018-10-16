@@ -1,5 +1,6 @@
 package h.maps.mapsproject.markers;
 
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 
 import org.osmdroid.util.GeoPoint;
@@ -22,7 +23,7 @@ public class LocationMarker extends MapMarker {
     }
 
     @Override
-    protected int selectIcon() {
+    public int getIconImage() {
         return R.drawable.person;
     }
 

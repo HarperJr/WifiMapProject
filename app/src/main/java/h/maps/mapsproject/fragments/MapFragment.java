@@ -1,12 +1,11 @@
-package h.maps.mapsproject.map;
+package h.maps.mapsproject.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.view.InputDevice;
 import android.view.LayoutInflater;
@@ -14,24 +13,25 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.tilesource.XYTileSource;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.util.TileSystem;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import h.maps.mapsproject.MapConstant;
 import h.maps.mapsproject.R;
 import h.maps.mapsproject.location.GlobalLocationListener;
 import h.maps.mapsproject.location.LocationHandler;
+import h.maps.mapsproject.markers.DynamicMarker;
 import h.maps.mapsproject.markers.LocationMarker;
+import h.maps.mapsproject.overlays.CustomOverlay;
 
 
 public class MapFragment extends Fragment implements LocationHandler.Callback, GlobalLocationListener{
@@ -43,6 +43,10 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
 
     private LocationMarker locationMarker;
     private SharedPreferences sharedPreferences;
+
+    private CustomOverlay customOverlay;
+
+    private final List<DynamicMarker> updatableMarkers = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -129,10 +133,13 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
         locationMarker = new LocationMarker(mapView);
         mapView.getOverlays().add(locationMarker);
 
+        customOverlay = new CustomOverlay(mapView);
+
         final ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
         scaleBarOverlay.setScaleBarOffset(16, 64);
 
         mapView.getOverlays().add(scaleBarOverlay);
+        mapView.getOverlays().add(customOverlay);
 
         mapView.setMinZoomLevel(MapConstant.MIN_ZOOM);
         mapView.setMaxZoomLevel(MapConstant.MAX_ZOOM);
@@ -217,10 +224,28 @@ public class MapFragment extends Fragment implements LocationHandler.Callback, G
     }
 
     @Override
-    public void onReceiveGlobal(List<Location> locations) {
-        for (Location location : locations) {
+    public void onReceiveGlobal(final List<Location> locations) {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < locations.size(); i++) {
+                    final Location location = locations.get(i);
+                    DynamicMarker marker;
 
-        }
+                    if (i >= updatableMarkers.size()) {
+                        marker = new DynamicMarker(mapView);
+
+                        mapView.getOverlays().add(marker);
+                        updatableMarkers.add(marker);
+                    } else {
+                        marker = updatableMarkers.get(i);
+                    }
+
+                    marker.onLocationChanged(location);
+                    mapView.invalidate();
+                }
+            }
+        });
     }
 
     public MapView getMapView() {

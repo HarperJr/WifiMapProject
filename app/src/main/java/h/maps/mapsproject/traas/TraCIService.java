@@ -32,7 +32,7 @@ public class TraCIService {
     public void connect(String host, int port) throws Exception {
         connection = new SumoTraciConnection(new InetSocketAddress(InetAddress.getByName(host), port));
 
-        setTimeStep("0.2");
+        setTimeStep("0.03");
 
         if (connection != null) {
             //Waiting for response
@@ -53,15 +53,16 @@ public class TraCIService {
             for(final String idListElement : (SumoStringList)connection.do_job_get(Vehicle.getIDList())) {
 
                 final double speed = (double) connection.do_job_get(Vehicle.getSpeed(idListElement));
-
+                final double angle = (double) connection.do_job_get(Vehicle.getAngle(idListElement));
                 final SumoPosition2D coordinates = (SumoPosition2D) connection.do_job_get(Vehicle.getPosition(idListElement));
                 final SumoPosition2D position = (SumoPosition2D) connection.do_job_get(Simulation.convertGeo(coordinates.x, coordinates.y, false));
 
                 final Location location = new Location(LocationManager.NETWORK_PROVIDER);
 
-                 location.setLatitude(position.x);
-                location.setLongitude(position.y);
+                location.setLongitude(position.x);
+                location.setLatitude(position.y);
                 location.setSpeed((float) speed);
+                location.setBearing((float) angle);
 
                 locations.add(location);
             }

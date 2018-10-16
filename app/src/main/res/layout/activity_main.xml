@@ -8,18 +8,10 @@
 
     <fragment
         android:id="@+id/map"
-        android:name="h.maps.mapsproject.map.MapFragment"
+        android:name="h.maps.mapsproject.fragments.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_osmmap"/>
-
-    <fragment
-        android:id="@+id/info_panel"
-        android:name="h.maps.mapsproject.UpperPanelFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        tools:layout="@layout/fragment_infopanel" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -41,6 +33,7 @@
         android:layout_marginTop="38dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/round_button"
-        app:srcCompat="@drawable/common_google_signin_btn_icon_light_normal_background" />
+        android:elevation="4dp"
+        app:srcCompat="@drawable/calibatron" />
 
 </RelativeLayout>

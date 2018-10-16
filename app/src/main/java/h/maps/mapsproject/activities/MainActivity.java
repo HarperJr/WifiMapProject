@@ -1,17 +1,16 @@
 package h.maps.mapsproject.activities;
 
 import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -24,12 +23,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import h.maps.mapsproject.R;
-import h.maps.mapsproject.location.GlobalUpdatesService;
+import h.maps.mapsproject.location.GlobalLocationIntentService;
 import h.maps.mapsproject.location.LocationHandler;
-import h.maps.mapsproject.map.MapFragment;
-import h.maps.mapsproject.traas.TraCIConnectionAsyncTask;
+import h.maps.mapsproject.fragments.MapFragment;
+import h.maps.mapsproject.traas.TraCIService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             final Bundle bundle = intent.getExtras();
-            final List<Location> locationExtras = bundle.getParcelableArrayList(GlobalUpdatesService.EXTRA_LOCATION_UPDATE);
+            final List<Location> locationExtras = bundle.getParcelableArrayList(GlobalLocationIntentService.EXTRA_GLOBAL_UPDATES);
 
             if (mapFragment != null) {
                 mapFragment.onReceiveGlobal(locationExtras);
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        registerReceiver(globalLocationsReceiver, new IntentFilter(GlobalUpdatesService.LOCATION_UPDATES));
+        registerReceiver(globalLocationsReceiver, new IntentFilter(GlobalLocationIntentService.ACTION_GLOBAL_UPDATES));
 
         locationHandler = new LocationHandler(this).setLocationUpdateCallback(locationCallback);
 
@@ -88,35 +89,7 @@ public class MainActivity extends AppCompatActivity {
         connectionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new TraCIConnectionAsyncTask()
-                        .setOnUpdateListener(new TraCIConnectionAsyncTask.OnUpdateListener() {
-                            @Override
-                            public void onPreUpdate() {
-                                progressBar.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onUpdate() {
-                                progressBar.animate();
-                            }
-
-                            @Override
-                            public void onPostUpdate() {
-
-                                progressBar.setVisibility(View.GONE);
-                                ComponentName serviceName = new ComponentName(MainActivity.this, GlobalUpdatesService.class);
-                                JobInfo jobInfo = new JobInfo.Builder(GlobalUpdatesService.JOB_ID, serviceName)
-                                        .setPeriodic(2000L)
-                                        .build();
-
-                                JobScheduler scheduler = (JobScheduler) MainActivity.this.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-                                if (scheduler == null) return;
-                                if (scheduler.schedule(jobInfo) == JobScheduler.RESULT_SUCCESS) {
-                                    Toast.makeText(MainActivity.this, "Connected to TraCI", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        })
+                new TraCIConnectivityTask()
                         .execute("192.168.137.1", "36332");
             }
         });
@@ -202,6 +175,50 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.READ_EXTERNAL_STORAGE
 
         );
+    }
+
+    class TraCIConnectivityTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected Boolean doInBackground(String... data) {
+            final TraCIService traCIService = TraCIService.getInstance();
+            try {
+                traCIService.connect(data[0], Integer.parseInt(data[1]));
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            progressBar.animate();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                final TimerTask asyncTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        final Intent serviceIntent = new Intent(getApplicationContext(), GlobalLocationIntentService.class);
+                        serviceIntent.setAction(GlobalLocationIntentService.ACTION_REQUEST_GLOBAL);
+
+                        startService(serviceIntent);
+                    }
+                };
+
+                new Timer().schedule(asyncTask, 0, 250);
+
+                Toast.makeText(MainActivity.this, "Connected to TraCI", Toast.LENGTH_LONG).show();
+            }
+
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
 }
